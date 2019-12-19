@@ -4,11 +4,10 @@ const Book = require('../models/books')
 const Author = require('../models/authors')
 const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif']
 
-
 // All Books Route
 router.get('/', async (req, res) => {
   let query = Book.find()
-  if (req.query.title !=  null && req.query.title != '') {
+  if (req.query.title != null && req.query.title != '') {
     query = query.regex('title', new RegExp(req.query.title, 'i'))
   }
   if (req.query.publishedBefore != null && req.query.publishedBefore != '') {
@@ -35,8 +34,6 @@ router.get('/new', async (req, res) => {
 
 // Create Book Route
 router.post('/', async (req, res) => {
-  const fileName = req.file != null ? req.file.filename : null
-
   const book = new Book({
     title: req.body.title,
     author: req.body.author,
@@ -44,9 +41,7 @@ router.post('/', async (req, res) => {
     pageCount: req.body.pageCount,
     description: req.body.description
   })
-
   saveCover(book, req.body.cover)
-  
 
   try {
     const newBook = await book.save()
@@ -71,12 +66,13 @@ async function renderNewPage(res, book, hasError = false) {
   }
 }
 
-function saveCover(book, coverEncoded){
-    if(coverEncoded == null) return
-    const cover = JSON.parse(coverEncoded)
-    if(cover != null && imageMimeTypes.includes(cover.type)){
-        book.coverImage = new Buffer.from(cover.data, 'base64')
-        book.coverImageType = cover.type
-    }
+function saveCover(book, coverEncoded) {
+  if (coverEncoded == null) return
+  const cover = JSON.parse(coverEncoded)
+  if (cover != null && imageMimeTypes.includes(cover.type)) {
+    book.coverImage = new Buffer.from(cover.data, 'base64')
+    book.coverImageType = cover.type
+  }
 }
+
 module.exports = router
